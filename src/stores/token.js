@@ -12,6 +12,7 @@ export const useTokenStore = defineStore('token', () => {
     const token = ref('')
         //2.定义函数修改token的值
     const setToken = (newToken) => {
+            console.log(newToken)
             token.value = newToken
         }
         //3.移除token

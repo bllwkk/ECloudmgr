@@ -17,7 +17,8 @@ instance.interceptors.request.use(
         let tokenStore = useTokenStore();
         //判断有没有token
         if (tokenStore.token) {
-            config.headers.Authorization = tokenStore.token
+            config.headers.token = tokenStore.token
+            console.log("在拦截器添加token了噢")
         }
         return config;
     },
@@ -34,8 +35,9 @@ instance.interceptors.response.use(
             return result.data;
         else {
             // alert(result.data.msg ? result.data.msg : '服务异常')
-            ElMessage.error(result.data.msg ? result.data.msg : '服务异常')
-            return Promise.reject(result.data)
+            ElMessage.error(result.data.message ? result.data.message : '服务异常')
+            return Promise.reject(result.data.message)
+
         }
     },
     err => {

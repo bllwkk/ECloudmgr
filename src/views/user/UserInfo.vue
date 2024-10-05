@@ -1,57 +1,59 @@
 <script setup>
 import { ref } from 'vue'
-const userInfo = ref({
-    id: 1,
-    userAccount: '',
-    userName: '',
-    userAvatar: '',
-    userProfile: '',
-    userRole: '',
-    createTime: '',
-    isDelete: 0
-})
-const rules = {
-    userName: [
-        { required: true, message: '请输入用户昵称', trigger: 'blur' },
+import { userInfoService, enableUserService, disableUserService } from '@/api/user.js'
+import {
+    TurnOff,
+    Open
+} from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus';
+const userInfoList = ref(
+    [
         {
-            pattern: /^\S{2,10}$/,
-            message: '昵称必须是2-10位的非空字符串',
-            trigger: 'blur'
-        }
+            "userName": "12345678910",
+            "userNickname": '小绿',
+            "userPhone": '19878645679',
+            "userState": "1"
+        },
     ]
-    // email: [
-    //     { required: true, message: '请输入用户邮箱', trigger: 'blur' },
-    //     { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
-    // ]
+)
+const getUserInfo = async () => {
+    let result = await userInfoService();
+    console.log(result.data);
+    userInfoList.value = result.data;
+}
+getUserInfo();
+const enable = async (userName) => {
+    let result = await enableUserService(userName);
+    ElMessage.success(result.message ? result.message : '启用成功');
+    getUserInfo();
+}
+const disable = async (userName) => {
+    let result = await disableUserService(userName);
+    ElMessage.success(result.message ? result.message : '禁用成功');
+    getUserInfo();
 }
 </script>
 <template>
     <el-card class="page-container">
         <template #header>
             <div class="header">
-                <span>基本资料</span>
+                <span>用户管理</span>
             </div>
         </template>
         <el-row>
-            <el-col :span="12">
-                <el-form :model="userInfo" :rules="rules" label-width="100px" size="large">
-                    <el-form-item label="登录账号">
-                        <el-input v-model="userInfo.id" disabled></el-input>
-                    </el-form-item>
-                    <el-form-item label="注册时间" prop="createTime">
-                        <el-input v-model="userInfo.createTime" disabled></el-input>
-                    </el-form-item>
-                    <el-form-item label="用户昵称" prop="userName">
-                        <el-input v-model="userInfo.userName"></el-input>
-                    </el-form-item>
-                    <el-form-item label="用户简介" prop="userProfile">
-                        <el-input v-model="userInfo.userProfile"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary">提交修改</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
+            <el-table :data="userInfoList" stripe style="width: 100%">
+                <el-table-column label="用户名" prop="userName"></el-table-column>
+                <el-table-column label="昵称" prop="userNickname"></el-table-column>
+                <el-table-column label="联系电话" prop="userPhone"></el-table-column>
+                <el-table-column label="状态" prop="userState"></el-table-column>
+                <el-table-column label="操作" width="100">
+                    <template #default="{ row }">
+                        <el-button v-if="row.userState === '1'" :icon="TurnOff"
+                            @click="disable(row.userName)"></el-button>
+                        <el-button v-if="row.userState === '0'" :icon="Open" @click="enable(row.userName)"></el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </el-row>
     </el-card>
 </template>

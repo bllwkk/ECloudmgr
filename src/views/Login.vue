@@ -4,67 +4,39 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useTokenStore } from '@/stores/token.js';
 //控制注册与登录表单的显示， 默认显示注册
-const isRegister = ref(false)
 //定义tokenStore
 const tokenStore = useTokenStore();
 //定义数据模型
-const registerData = ref({
-    userAccount: '',
-    password: '',
-    rePassword: ''
+const loginData = ref({
+    adminName: '',
+    adminPassword: '',
 })
-//校验密码的函数
-const checkRePassword = (rule, value, callback) => {
-    if (value === '') {
-        callback(new Error('请再次确认密码'))
-    } else if (value !== registerData.value.password) {
-        callback(new Error('请确保两次输入的密码一致'))
-    } else {
-        callback()
-    }
-}
+
 //定义表单校验规则
 const rules = {
-    username: [
+    adminName: [
         { require: true, message: '请输入账号', trigger: 'blur' },
-        { min: 11, max: 11, message: '11位数字', trigger: 'blur' }
+        // { min: 11, max: 11, message: '11位数字', trigger: 'blur' }
     ],
-    password: [
+    adminPassword: [
         { require: true, message: '请输入密码', trigger: 'blur' },
         { min: 6, max: 6, message: '长度为6的数字', trigger: 'blur' }
-    ],
-    rePassword: [
-        { validator: checkRePassword, trigger: 'blur' }
     ]
 }
 //调用后台接口，完成注册
-import { userRegisterService, userLoginService } from '@/api/user.js'
-const register = async () => {
-    let result = await userRegisterService(registerData.value);
-    // if (result.code === 0) {
-    //     //成功
-    //     alert(result.msg ? result.msg : '注册成功');
-    // } else {
-    //     alert('注册失败')
-    // }
-    // alert(result.msg ? result.msg : '注册成功');
-    ElMessage.success(result.msg ? result.msg : '注册成功')
-}
+import { adminLoginService } from '@/api/user.js'
+
 //登录函数
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const login = async () => {
     //调用接口，完成登录
-    let result = await userLoginService(registerData.value);
-    // if (result.code === 0) {
-    //     alert(result.msg ? result.msg : '登录成功');
-    // } else {
-    //     alert('登录失败')
-    // }
-    //alert(result.msg ? result.msg : '登录成功');
+    let result = await adminLoginService(loginData.value.adminName, loginData.value.adminPassword);
+
     ElMessage.success(result.msg ? result.msg : '登录成功')
     //把得到的token存入pinia
     tokenStore.setToken(result.data)
+    console.log(result.data)
     //跳转到首页
     router.push('/')
 }
@@ -75,44 +47,18 @@ const login = async () => {
         <el-col :span="12" class="bg"></el-col>
         <el-col :span="6" :offset="3" class="form">
             <!-- 注册表单 -->
-            <el-form ref="form" size="large" autocomplete="off" v-if="isRegister" :model="registerData" :rules="rules">
-                <el-form-item>
-                    <h1>注册</h1>
-                </el-form-item>
-                <el-form-item prop="userAccount">
-                    <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.userAccount"></el-input>
-                </el-form-item>
-                <el-form-item prop="password">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入密码"
-                        v-model="registerData.password"></el-input>
-                </el-form-item>
-                <el-form-item prop="rePassword">
-                    <el-input :prefix-icon="Lock" type="password" placeholder="请输入再次密码"
-                        v-model="registerData.rePassword"></el-input>
-                </el-form-item>
-                <!-- 注册按钮 -->
-                <el-form-item>
-                    <el-button class="button" type="primary" auto-insert-space @click="register">
-                        注册
-                    </el-button>
-                </el-form-item>
-                <el-form-item class="flex">
-                    <el-link type="info" :underline="false" @click="isRegister = false">
-                        ← 返回
-                    </el-link>
-                </el-form-item>
-            </el-form>
+
             <!-- 登录表单 -->
-            <el-form ref="form" size="large" autocomplete="off" v-else:model="registerData" :rules=rules>
+            <el-form ref="form" size="large" autocomplete="off" :model="loginData" :rules=rules>
                 <el-form-item>
-                    <h1>登录</h1>
+                    <h1>管理员登录</h1>
                 </el-form-item>
-                <el-form-item prop="userAccount">
-                    <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.userAccount"></el-input>
+                <el-form-item prop="adminName">
+                    <el-input :prefix-icon="User" placeholder="请输入账户" v-model="loginData.adminName"></el-input>
                 </el-form-item>
-                <el-form-item prop="password">
-                    <el-input name="password" :prefix-icon="Lock" type="password" placeholder="请输入密码"
-                        v-model="registerData.password"></el-input>
+                <el-form-item prop="adminPassword">
+                    <el-input name="adminPassword" :prefix-icon="Lock" type="password" placeholder="请输入密码"
+                        v-model="loginData.adminPassword"></el-input>
                 </el-form-item>
                 <el-form-item class="flex">
                     <div class="flex">
@@ -124,11 +70,7 @@ const login = async () => {
                 <el-form-item>
                     <el-button class="button" type="primary" auto-insert-space @click="login">登录</el-button>
                 </el-form-item>
-                <el-form-item class="flex">
-                    <el-link type="info" :underline="false" @click="isRegister = true">
-                        注册 →
-                    </el-link>
-                </el-form-item>
+
             </el-form>
         </el-col>
     </el-row>
@@ -141,8 +83,8 @@ const login = async () => {
     background-color: #fff;
 
     .bg {
-        background: url('@/assets/logo2.png') no-repeat 60% center / 240px auto,
-            url('@/assets/login_bg.jpg') no-repeat center / cover;
+        // background: url('@/assets/logo2.png') no-repeat 60% center / 240px auto,
+        //     url('@/assets/login_bg.jpg') no-repeat center / cover;
         border-radius: 0 20px 20px 0;
     }
 
