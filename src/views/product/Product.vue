@@ -260,7 +260,7 @@ const deleteProduct = async (productId) => {//没写好，之后再写
                 </el-form-item>
                 <el-form-item label="商品图片">
                     <el-upload class="avatar-uploader" :auto-upload="true" :show-file-list="false"
-                        action="api/api/files/upload" name="file" :headers="{ 'token': tokenStore.token }"
+                        action="/api/api/files/upload" name="file" :headers="{ 'token': tokenStore.token }"
                         :on-success="uploadSuccess">
                         <img v-if="productAddModel.productPicture" :src="productAddModel.productPicture"
                             class="avatar" />

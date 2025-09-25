@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "dev": "vite --host 0.0.0.0",
+        "dev": "vite --host 0.0.0.0 --port 5050",
         "build": "vite build",
         "preview": "vite preview"
     },
@@ -11,6 +11,7 @@
         "@vueup/vue-quill": "^1.2.0",
         "axios": "^1.5.1",
         "element-plus": "^2.4.1",
+        "i": "^0.3.7",
         "pinia": "^2.1.7",
         "pinia-persistedstate-plugin": "^0.1.0",
         "vue": "^3.3.4",
